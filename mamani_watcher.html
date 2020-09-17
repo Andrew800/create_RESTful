@@ -1,0 +1,91 @@
+<html>
+  <head>
+    <title>Mamani Watch</title>
+    <style>
+      body, html {
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        font-family: "Comic Sans MS", cursive, sans-serif;
+      }
+      #message {
+        text-align: center;
+        margin-top: 40vh;
+        font-size: 50px;
+      }
+    </style>
+  </head>
+  <body onload="onLoad()">
+    <div id="main"></div>
+    <div id="message"></div>
+    <script>
+      function onLoad() {
+        fetch("http://localhost:3000/data").then((res) => {
+          res.json().then((data) => {
+            let mamani_count = 0;
+            for (item of data) {
+              console.log(item);
+              for (str of item) {
+                if (str.toLowerCase().includes("mamani")) {
+                  console.log("Mamani found!");
+
+                  let mamani = document.createElement("img");
+                  mamani.src = "./unknown.gif";
+                  document.getElementById("main").appendChild(mamani);
+
+                  mamani_count++;
+                }
+              }
+            }
+            if (mamani_count == 0) {
+              document.getElementById("message").innerText = "No Mamanis Found:(";
+            } else {
+              document.getElementById("message").innerText = `${mamani_count} Mamanis were found!`
+              initiateMovement();
+            }
+          });
+        });
+      }
+
+      function initiateMovement() {
+        let images = document.getElementById("main").querySelectorAll("img");
+
+        for (image of images) {
+          console.log("Image found!")
+          startMovement(image);
+        }
+      }
+
+      function startMovement(image) {
+        console.log("Starting!")
+        let xIncrease = 3;
+        let yIncrease = 3;
+        let trValueX = 0;
+        let trValueY = 0;
+
+        setInterval(() => {
+          let imageStyle = image.style;
+          // imageStyle.opacity = 0.1;
+          let x = Number(image.getBoundingClientRect().left);
+          let y = Number(image.getBoundingClientRect().top);
+          if (x > window.innerWidth || x < 0) {
+            xIncrease = Math.sign(-xIncrease) * randomElementFrom([1,2,3]);
+          }
+          if (y > window.innerHeight || y < 0) {
+            yIncrease = Math.sign(-yIncrease) * randomElementFrom([1,2,3]);
+          }
+
+          trValueX += xIncrease;
+          trValueY += yIncrease;
+
+          imageStyle.transform = `translateX(${trValueX}px) translateY(${trValueY}px)`;
+        }, 5);
+      }
+
+      function randomElementFrom(arr) {
+        return arr[Math.floor(arr.length * Math.random())]
+      }
+    </script>
+  </body>
+</html>
